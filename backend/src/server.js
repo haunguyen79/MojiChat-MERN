@@ -16,7 +16,6 @@ app.use("/api/auth", authRoute);
 
 //Private Routes
 
-
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server bắt đầu trên cổng ${PORT}`);
