@@ -2,7 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./libs/db.js";
 import authRoute from "./routers/authRoute.js";
+import userRoute from "./routers/userRouter.js";
 import cookieParser from "cookie-parser";
+import { protectedRoute } from "./middlewares/authMiddleware.js";
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -17,6 +19,8 @@ app.use(cookieParser()); // Middleware to parse cookies
 app.use("/api/auth", authRoute);
 
 //Private Routes
+app.use(protectedRoute); // Middleware bảo vệ các route sau
+app.use("/api/users", userRoute);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
