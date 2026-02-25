@@ -3,16 +3,41 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const signUpSchema = z.object({
+  firstName: z.string().min(1, "Tên không được để trống"),
+  lastName: z.string().min(1, "Họ không được để trống"),
+  username: z.string().min(3, "Tên đăng nhập phải có ít nhất 3 ký tự"),
+  email: z.email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+});
+
+type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
+  });
+
+  const onSubmit = async (data: SignUpFormValues) => {
+    console.log(data);
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0 border-border">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
               {/* Header - logo */}
               <div className="flex flex-col items-center text-center gap-2">
@@ -31,16 +56,30 @@ export function SignupForm({
                   <Label htmlFor="lastname" className="block text-sm">
                     Họ
                   </Label>
-                  <Input type="text" id="lastname" />
+                  <Input type="text" id="lastname" {...register("lastName")} />
                   {/**todo: error message */}
+                  {errors.lastName && (
+                    <p className="text-destructive text-sm">
+                      {errors.lastName.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="firstname" className="block text-sm">
                     Tên
                   </Label>
-                  <Input type="text" id="firstname" />
+                  <Input
+                    type="text"
+                    id="firstname"
+                    {...register("firstName")}
+                  />
                   {/**todo: error message */}
+                  {errors.firstName && (
+                    <p className="text-destructive text-sm">
+                      {errors.firstName.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -49,8 +88,18 @@ export function SignupForm({
                 <Label htmlFor="username" className="block text-sm">
                   Tên đăng nhập
                 </Label>
-                <Input type="text" id="username" placeholder="moji" />
+                <Input
+                  type="text"
+                  id="username"
+                  placeholder="moji"
+                  {...register("username")}
+                />
                 {/**todo: error message */}
+                {errors.username && (
+                  <p className="text-destructive text-sm">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
 
               {/* email */}
@@ -58,8 +107,18 @@ export function SignupForm({
                 <Label htmlFor="remail" className="block text-sm">
                   Email
                 </Label>
-                <Input type="email" id="email" placeholder="m@gmail.com" />
+                <Input
+                  type="email"
+                  id="email"
+                  placeholder="m@gmail.com"
+                  {...register("email")}
+                />
                 {/**todo: error message */}
+                {errors.email && (
+                  <p className="text-destructive text-sm">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
               {/* password */}
@@ -67,12 +126,21 @@ export function SignupForm({
                 <Label htmlFor="password" className="block text-sm">
                   Mật khẩu
                 </Label>
-                <Input type="password" id="password" />
+                <Input
+                  type="password"
+                  id="password"
+                  {...register("password")}
+                />
                 {/**todo: error message */}
+                {errors.password && (
+                  <p className="text-destructive text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               {/* Nút đăng ký */}
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 Tạo tài khoản
               </Button>
 
