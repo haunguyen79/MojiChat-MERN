@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, "Tên không được để trống"),
