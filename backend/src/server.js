@@ -5,6 +5,7 @@ import authRoute from "./routers/authRoute.js";
 import userRoute from "./routers/userRouter.js";
 import cookieParser from "cookie-parser";
 import { protectedRoute } from "./middlewares/authMiddleware.js";
+import cors from "cors";
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 5001;
 // Middleware to parse JSON requests
 app.use(express.json());
 app.use(cookieParser()); // Middleware to parse cookies
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 // Public Routes
 app.use("/api/auth", authRoute);

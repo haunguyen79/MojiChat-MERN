@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useNavigate } from "react-router";
 
 const signInSchema = z.object({
   username: z.string().min(3, "Tên đăng nhập phải có ít nhất 3 ký tự"),
@@ -18,6 +20,9 @@ export function SigninForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { signIn } = useAuthStore();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -27,8 +32,12 @@ export function SigninForm({
   });
 
   const onSubmit = async (data: SignInFormValues) => {
-    console.log(data);
+    // console.log(data);
+    const { username, password } = data;
+    await signIn(username, password);
+    navigate("/"); // Chuyển hướng về trang chủ sau khi đăng nhập thành công
   };
+  
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0 border-border">
