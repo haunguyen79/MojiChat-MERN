@@ -4,7 +4,7 @@ import Session from "../models/Session.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-const ACCESS_TOKEN_TTL = "30s";
+const ACCESS_TOKEN_TTL = "30m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 ngày (Tính theo mili giây)
 
 export const signUp = async (req, res) => {
@@ -115,7 +115,7 @@ export const signOut = async (req, res) => {
     // Lấy refreshToken từ cookie
     const token = req.cookies?.refreshToken;
 
-    if (!token) {
+    if (token) {
       //  Xóa refresh token trong Session
       await Session.deleteOne({ refreshToken: token });
 
