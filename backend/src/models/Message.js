@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const messsageSchema = new mongoose.Schema(
+const messageSchema = new mongoose.Schema(
   {
     conversationId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -26,7 +26,7 @@ const messsageSchema = new mongoose.Schema(
   },
 );
 
-messageSchema.index({ conversationId: 1, createdAt: -1 }); // Khi truy vấn tin nhắn của 1 hội thoại, những tin nhắn có cùng conversationId sẽ được lưu trữ gần nhau từ mới đến cũ, giúp tăng tốc độ truy vấn.
+messageSchema.index({ conversationId: 1, createdAt: -1 }); /* Khi truy vấn tin nhắn của 1 hội thoại, những tin nhắn có cùng conversationId sẽ được lưu trữ gần nhau từ mới đến cũ, giúp tăng tốc độ truy vấn. */
 
 const MessageSchema = mongoose.model("Message", messageSchema);
 

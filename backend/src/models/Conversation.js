@@ -69,7 +69,7 @@ const conversationSchema = new mongoose.Schema(
     group: {
       type: groupSchema,
     },
-    lastMessage: {
+    lastMessageAt: {
       type: Date,
     },
     seenBy: [
@@ -82,7 +82,7 @@ const conversationSchema = new mongoose.Schema(
       type: lastMessageSchema,
       default: null,
     },
-    unreadCount: {
+    unreadCounts: {
       type: Map,
       of: Number,
       default: {},
