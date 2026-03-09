@@ -33,7 +33,7 @@ export const signUp = async (req, res) => {
       username,
       hashedPassword,
       email,
-      displayName: `${firstName} ${lastName}`,
+      displayName: `${lastName} ${firstName}`,
     });
 
     // Trả về phản hồi thành công
@@ -159,7 +159,7 @@ export const refreshToken = async (req, res) => {
 
     // Return accessToken mới về client
     return res.status(200).json({ accessToken });
-    
+
   } catch (error) {
     console.error("Lỗi khi gọi refreshToken:", error);
     return res.status(500).json({ message: "Lỗi hệ thống" });
