@@ -120,9 +120,48 @@ export const getConversation = async (req, res) => {
 
     return res.status(200).json({ conversations: formatted });
   } catch (error) {
-    console.error("Lỗi xảy ra khi lấy conversations (danh sách cuộc trò chuyện): ", error);
+    console.error(
+      "Lỗi xảy ra khi lấy conversations (danh sách cuộc trò chuyện): ",
+      error,
+    );
     return res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
 
-export const getMessages = async (req, res) => {};
+export const getMessages = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const { limit = 50, cursor } = req.query;
+
+    /** 
+    /conversations/${conversationId}/messages?limit=${pageLimit}&cursor=${cursor}
+     */
+
+    const query = { conversationId };
+
+    if (cursor) {
+      query._id = { $lt: new Date(cursor) }; // Lấy các tin nhắn có _id nhỏ hơn cursor (tức là các tin nhắn cũ hơn)
+    }
+
+    let messages = (await Message.find(query))
+      .sort({ createAt: -1 }) // Sắp xếp theo createAt giảm dần để lấy tin nhắn mới nhất trước
+      .limit(Number(limit) + 1); // Lấy thêm 1 tin nhắn để kiểm tra xem còn tin nhắn nào nữa hay không
+
+    let nextCursor = null;
+
+    if (messages.length > Number(limit)) {
+      const nextMessage = messages[messages.length - 1]; // Tin nhắn cuối cùng trong danh sách (tin nhắn cũ nhất)
+
+      nextCursor = nextMessage._id; // Sử dụng _id của tin nhắn cuối cùng làm cursor cho lần truy vấn tiếp theo
+
+      messages.pop(); // Loại bỏ tin nhắn cuối cùng khỏi kết quả trả về vì nó chỉ dùng để kiểm tra xem còn tin nhắn nào nữa hay không
+    }
+
+    messages = await messages.reverse(); // Đảo ngược thứ tự tin nhắn để trả về theo thứ tự từ cũ đến mới
+
+    return res.status(200).json({ messages, nextCursor });
+  } catch (error) {
+    console.error("Lỗi xảy ra khi lấy messages", error);
+    return res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
