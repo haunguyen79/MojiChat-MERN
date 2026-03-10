@@ -1,0 +1,1318 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MojiChat - MERN",
+    "version": "1.0.0",
+    "description": "API documentation for MojiChat App - A real-time MERN chat application."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5001/api",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Đăng ký, đăng nhập, đăng xuất và làm mới access token"
+    },
+    {
+      "name": "Users",
+      "description": "Thông tin người dùng hiện tại"
+    },
+    {
+      "name": "Friends",
+      "description": "Quản lý bạn bè và lời mời kết bạn"
+    },
+    {
+      "name": "Conversations",
+      "description": "Quản lý cuộc trò chuyện (direct & group)"
+    },
+    {
+      "name": "Messages",
+      "description": "Gửi tin nhắn trực tiếp hoặc tin nhắn nhóm"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Nhập access token nhận được sau khi đăng nhập (/auth/signin)"
+      }
+    },
+    "schemas": {
+      "UserPublic": {
+        "type": "object",
+        "description": "Thông tin công khai của một người dùng",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Leo Messi"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+          }
+        }
+      },
+      "UserFull": {
+        "type": "object",
+        "description": "Thông tin đầy đủ của người dùng hiện tại",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+          },
+          "username": {
+            "type": "string",
+            "example": "user1"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user1@gmail.com"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Leo Messi"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+          },
+          "avatarId": {
+            "type": "string",
+            "nullable": true,
+            "example": "mojichat/avatars/user1_avatar"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true,
+            "example": "Xin chào! Tôi đang dùng MojiChat."
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "0797956789"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T08:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-10T12:00:00.000Z"
+          }
+        }
+      },
+      "FriendRequest": {
+        "type": "object",
+        "description": "Một lời mời kết bạn",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+          },
+          "from": {
+            "type": "string",
+            "description": "ID người gửi",
+            "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+          },
+          "to": {
+            "type": "string",
+            "description": "ID người nhận",
+            "example": "69998974c0e73e6753e31937"
+          },
+          "message": {
+            "type": "string",
+            "example": "Mình có thể kết bạn không?"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "accepted", "declined"],
+            "example": "pending"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Participant": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/UserPublic"
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-15T08:30:00.000Z"
+          }
+        }
+      },
+      "LastMessage": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true,
+            "example": "Xin chào!"
+          },
+          "senderId": {
+            "$ref": "#/components/schemas/UserPublic"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2024-06-10T12:00:00.000Z"
+          }
+        }
+      },
+      "Conversation": {
+        "type": "object",
+        "description": "Một cuộc trò chuyện (direct hoặc group)",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "68fb2e6a19c501587577291c"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["direct", "group"],
+            "example": "group"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Participant"
+            }
+          },
+          "group": {
+            "type": "object",
+            "nullable": true,
+            "description": "Thông tin nhóm (chỉ có khi type = group)",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Nhóm ABC"
+              },
+              "createdBy": {
+                "type": "string",
+                "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+              }
+            }
+          },
+          "lastMessage": {
+            "$ref": "#/components/schemas/LastMessage"
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2024-06-10T12:00:00.000Z"
+          },
+          "seenBy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserPublic"
+            }
+          },
+          "unreadCounts": {
+            "type": "object",
+            "description": "Map userId -> số tin nhắn chưa đọc",
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "example": { "64f1a2b3c4d5e6f7a8b9c0d1": 3 }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "description": "Một tin nhắn",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+          },
+          "conversationId": {
+            "type": "string",
+            "example": "68fb2e6a19c501587577291c"
+          },
+          "senderId": {
+            "type": "string",
+            "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+          },
+          "content": {
+            "type": "string",
+            "example": "Xin chào mọi người!"
+          },
+          "imgUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-10T12:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Lỗi hệ thống"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "summary": "SignUp",
+        "description": "Đăng ký tài khoản mới. Không yêu cầu xác thực. Trả về `204 No Content` nếu thành công.",
+        "tags": ["Authentication"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password", "email", "firstName", "lastName"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "user8"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "password123"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user8@gmail.com"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "example": "Eight"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Đăng ký thành công"
+          },
+          "400": {
+            "description": "Thiếu thông tin bắt buộc",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Không thể thiếu username, password, email, firstName và lastName"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Username đã tồn tại",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "username đã tồn tại"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "summary": "SignIn",
+        "description": "Đăng nhập bằng username và password. Trả về `accessToken` trong response body và `refreshToken` được lưu vào cookie `HttpOnly`.",
+        "tags": ["Authentication"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "user1"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đăng nhập thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User One đăng nhập thành công"
+                    },
+                    "accessToken": {
+                      "type": "string",
+                      "description": "JWT access token, có hiệu lực trong 30 phút",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Thiếu username hoặc password",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "message": "Thiếu username hoặc password. Vui lòng cung cấp đầy đủ thông tin."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Username hoặc password không chính xác",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "message": "Username hoặc password không chính xác."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signout": {
+      "post": {
+        "summary": "SignOut",
+        "description": "Đăng xuất khỏi hệ thống. Xóa session (refresh token) trong DB và xóa cookie `refreshToken` trên client. Luôn trả về `204` dù có hay không có token trong cookie.",
+        "tags": ["Authentication"],
+        "security": [],
+        "responses": {
+          "204": {
+            "description": "Đăng xuất thành công"
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "RefreshToken",
+        "description": "Tạo mới `accessToken` từ `refreshToken` lưu trong cookie. Không cần gửi body. Client phải đính kèm cookie `refreshToken` trong request.",
+        "tags": ["Authentication"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Tạo mới access token thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": {
+                      "type": "string",
+                      "description": "JWT access token mới, có hiệu lực trong 30 phút",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Không tìm thấy refresh token trong cookie",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Token không tồn tại!" }
+              }
+            }
+          },
+          "403": {
+            "description": "Refresh token không hợp lệ hoặc đã hết hạn.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Token không hợp lệ hoặc đã hết hạn!" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "summary": "AuthMe",
+        "description": "Lấy thông tin đầy đủ của người dùng đang đăng nhập dựa trên access token trong header.",
+        "tags": ["Users"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lấy thông tin thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/UserFull"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực / Access token không hợp lệ",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friends/requests": {
+      "post": {
+        "summary": "SendFriendRequest",
+        "description": "Gửi lời mời kết bạn tới một user khác. Không thể gửi cho chính mình hay nếu đã là bạn bè hoặc đã có lời mời đang chờ.",
+        "tags": ["Friends"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["to"],
+                "properties": {
+                  "to": {
+                    "type": "string",
+                    "description": "ID của người nhận lời mời",
+                    "example": "69998974c0e73e6753e31937"
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Tin nhắn kèm theo lời mời (tuỳ chọn)",
+                    "example": "Mình có thể kết bạn không?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gửi lời mời thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Gửi lời mời kết bạn thành công"
+                    },
+                    "request": {
+                      "$ref": "#/components/schemas/FriendRequest"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Không hợp lệ: tự gửi cho mình, đã là bạn, hoặc đã có lời mời đang chờ",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "selfRequest": {
+                    "value": { "message": "Không thể gửi lời mời kết bạn cho chính mình" }
+                  },
+                  "alreadyFriends": {
+                    "value": { "message": "Hai người đã là bạn bè" }
+                  },
+                  "pendingRequest": {
+                    "value": { "message": "Đã có lời mời kết bạn đang chờ" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetFriendRequests",
+        "description": "Lấy danh sách tất cả lời mời kết bạn liên quan đến user hiện tại: bao gồm lời mời đã gửi (`sent`) và lời mời đã nhận (`received`).",
+        "tags": ["Friends"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lấy danh sách thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sent": {
+                      "type": "array",
+                      "description": "Danh sách lời mời đã gửi đi",
+                      "items": {
+                        "allOf": [
+                          { "$ref": "#/components/schemas/FriendRequest" },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "to": {
+                                "$ref": "#/components/schemas/UserPublic"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "received": {
+                      "type": "array",
+                      "description": "Danh sách lời mời đã nhận",
+                      "items": {
+                        "allOf": [
+                          { "$ref": "#/components/schemas/FriendRequest" },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "from": {
+                                "$ref": "#/components/schemas/UserPublic"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friends/requests/{requestId}/accept": {
+      "post": {
+        "summary": "AcceptFriendRequest",
+        "description": "Chấp nhận lời mời kết bạn theo ID. Chỉ người nhận lời mời mới có quyền chấp nhận. Sau khi chấp nhận, bản ghi `FriendRequest` sẽ bị xóa và một bản ghi `Friend` mới được tạo.",
+        "tags": ["Friends"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "description": "MongoDB ObjectId của lời mời kết bạn",
+            "schema": {
+              "type": "string",
+              "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chấp nhận thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Chấp nhận lời mời kết bạn thành công"
+                    },
+                    "newFriend": {
+                      "$ref": "#/components/schemas/UserPublic"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Không có quyền chấp nhận lời mời này",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Bạn không có quyền chấp nhận lời mời kết bạn này" }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy lời mời",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Không tìm thấy lời mời kết bạn" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friends/requests/{requestId}/decline": {
+      "post": {
+        "summary": "DeclineFriendRequest",
+        "description": "Từ chối lời mời kết bạn theo ID. Chỉ người nhận lời mời mới có quyền từ chối. Bản ghi `FriendRequest` sẽ bị xóa. Trả về `204 No Content` nếu thành công.",
+        "tags": ["Friends"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "description": "MongoDB ObjectId của lời mời kết bạn",
+            "schema": {
+              "type": "string",
+              "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Từ chối thành công"
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Không có quyền từ chối lời mời này",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Bạn không có quyền từ chối lời mời này" }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy lời mời",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Không tìm thấy lời mời kết bạn" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friends/": {
+      "get": {
+        "summary": "GetAllFriends",
+        "description": "Lấy danh sách tất cả bạn bè của người dùng hiện tại. Trả về mảng rỗng nếu chưa có bạn.",
+        "tags": ["Friends"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lấy danh sách thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "friends": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UserPublic"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "friends": [
+                    {
+                      "_id": "69998974c0e73e6753e31937",
+                      "displayName": "Kevin De Bruyne",
+                      "avatarUrl": null
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/": {
+      "post": {
+        "summary": "CreateConversation",
+        "description": "Tạo cuộc trò chuyện mới. Nếu `type` là `direct` và cuộc trò chuyện giữa 2 người đã tồn tại, trả về cuộc trò chuyện hiện có. Nếu `type` là `group`, phải cung cấp thêm `name`. Middleware kiểm tra quan hệ bạn bè trước khi tạo.",
+        "tags": ["Conversations"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["type", "memberIds"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["direct", "group"],
+                    "example": "group"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Tên nhóm (bắt buộc khi type = group)",
+                    "example": "Nhóm ABC"
+                  },
+                  "memberIds": {
+                    "type": "array",
+                    "description": "Danh sách ID các thành viên (không bao gồm người tạo)",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["69a7fd6ee511bdd62b719145", "69998974c0e73e6753e31937"]
+                  }
+                }
+              },
+              "examples": {
+                "createGroup": {
+                  "summary": "Tạo cuộc trò chuyện nhóm",
+                  "value": {
+                    "type": "group",
+                    "name": "Nhóm ABC",
+                    "memberIds": ["69a7fd6ee511bdd62b719145"]
+                  }
+                },
+                "createDirect": {
+                  "summary": "Tạo cuộc trò chuyện trực tiếp",
+                  "value": {
+                    "type": "direct",
+                    "memberIds": ["69998974c0e73e6753e31937"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo hoặc lấy cuộc trò chuyện thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "conversation": {
+                      "$ref": "#/components/schemas/Conversation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu đầu vào không hợp lệ (thiếu name cho group, memberIds rỗng, type không hợp lệ)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Tên nhóm và danh sách thành viên là bắt buộc" }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetConversations",
+        "description": "Lấy danh sách tất cả cuộc trò chuyện của người dùng hiện tại, sắp xếp theo tin nhắn mới nhất trước (`lastMessageAt` giảm dần).",
+        "tags": ["Conversations"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lấy danh sách thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "conversations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Conversation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/{conversationId}/messages": {
+      "get": {
+        "summary": "GetMessages",
+        "description": "Lấy danh sách tin nhắn của một cuộc trò chuyện theo ID. Hỗ trợ phân trang kiểu cursor-based. Mặc định trả về 50 tin nhắn mới nhất, sắp xếp từ cũ đến mới. Nếu còn tin nhắn cũ hơn, `nextCursor` sẽ được trả về để dùng cho lần truy vấn tiếp theo.",
+        "tags": ["Conversations"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "conversationId",
+            "in": "path",
+            "required": true,
+            "description": "MongoDB ObjectId của cuộc trò chuyện",
+            "schema": {
+              "type": "string",
+              "example": "68fb2e6a19c501587577291c"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Số lượng tin nhắn tối đa trả về (mặc định: 50)",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "example": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Cursor từ response trước để tải thêm tin nhắn cũ hơn (là `_id` của tin nhắn cũ nhất đã nhận)",
+            "schema": {
+              "type": "string",
+              "example": "64f1a2b3c4d5e6f7a8b9c0d1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy tin nhắn thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "description": "Danh sách tin nhắn, sắp xếp từ cũ đến mới",
+                      "items": {
+                        "$ref": "#/components/schemas/Message"
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Cursor để load thêm tin nhắn cũ hơn. Null nếu đã hết.",
+                      "example": "64f0a1b2c3d4e5f6a7b8c9d0"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/direct": {
+      "post": {
+        "summary": "SendDirectMessage",
+        "description": "Gửi tin nhắn trực tiếp tới một user. Có thể truyền `conversationId` nếu cuộc trò chuyện đã tồn tại, hoặc chỉ cần `recipientId` để tự động tạo mới. Middleware kiểm tra quan hệ bạn bè trước khi gửi.",
+        "tags": ["Messages"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["content"],
+                "properties": {
+                  "recipientId": {
+                    "type": "string",
+                    "description": "ID người nhận (bắt buộc nếu không có conversationId)",
+                    "example": "69a19399ff2664c2bd9657ef"
+                  },
+                  "conversationId": {
+                    "type": "string",
+                    "description": "ID cuộc trò chuyện hiện có (nếu đã biết)",
+                    "example": "68fb2e6a19c501587577291c"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Nội dung tin nhắn",
+                    "example": "Xin chào!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gửi tin nhắn thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Thiếu nội dung tin nhắn",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Thiếu nội dung" }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/group": {
+      "post": {
+        "summary": "SendGroupMessage",
+        "description": "Gửi tin nhắn vào một cuộc trò chuyện nhóm. Middleware kiểm tra xem người gửi có phải là thành viên của nhóm không trước khi xử lý.",
+        "tags": ["Messages"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["conversationId", "content"],
+                "properties": {
+                  "conversationId": {
+                    "type": "string",
+                    "description": "ID của cuộc trò chuyện nhóm",
+                    "example": "69ae530272262332e97850d8"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Nội dung tin nhắn",
+                    "example": "Chào mọi người!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gửi tin nhắn nhóm thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Thiếu nội dung tin nhắn",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "message": "Thiếu nội dung" }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa xác thực",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Không phải thành viên của nhóm",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Lỗi server",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -9,6 +9,8 @@ import conversationRoute from "./routers/conversationRoute.js";
 import cookieParser from "cookie-parser";
 import { protectedRoute } from "./middlewares/authMiddleware.js";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs"; // Thư viện dùng để đọc file/tệp json
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -19,6 +21,12 @@ const PORT = process.env.PORT || 5001;
 app.use(express.json());
 app.use(cookieParser()); // Middleware to parse cookies
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
+// Swagger setup
+const swaggerDocument = JSON.parse(
+  fs.readFileSync("./src/swagger.json", "utf-8"),
+); // Đọc file swagger.json
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Thiết lập route /api-docs để hiển thị tài liệu Swagger
 
 // Public Routes
 app.use("/api/auth", authRoute);
