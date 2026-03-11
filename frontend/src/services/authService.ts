@@ -1,4 +1,4 @@
-import api from "../lib/axios";
+import api from "@/lib/axios";
 
 export const authService = {
   signUp: async (
@@ -31,7 +31,7 @@ export const authService = {
         username,
         password,
       },
-      { withCredentials: true },
+      { withCredentials: true }, 
     );
     return res.data; // Trả về accessToken
   },
