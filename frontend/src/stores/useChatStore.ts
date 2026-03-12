@@ -11,7 +11,7 @@ export const useChatStore = create<ChatState>()(
       activeConversationId: null,
       loading: false,
 
-      setActionConversationId: (id) =>
+      setActiveConversation: (id) =>
         set({
           activeConversationId: id,
         }),
