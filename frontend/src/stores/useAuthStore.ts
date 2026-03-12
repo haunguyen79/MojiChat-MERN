@@ -57,7 +57,8 @@ export const useAuthStore = create<AuthState>()(
           const { accessToken } = await authService.signIn(username, password);
           get().setAccessToken(accessToken);
 
-          await get().fetchMe();
+          await get().fetchMe();  // Gọi API để lấy thông tin người dùng
+          useChatStore.getState().fetchConversations(); // Gọi API để lấy danh sách cuộc trò chuyện
 
           toast.success("Chào mừng bạn đã quay trở lại với Moji 🎉🎉🎉");
           // Call API
