@@ -25,7 +25,7 @@ const UserAvatar = ({ type, name, avatarUrl, className }: IUserAvatarProps) => {
     >
       <AvatarImage src={avatarUrl} alt={name} />
       <AvatarFallback className={`${bgColor} text-white font-semibold`}>
-        {name.charAt(0).toUpperCase()}
+        {name.charAt(0)}
       </AvatarFallback>
     </Avatar>
   );

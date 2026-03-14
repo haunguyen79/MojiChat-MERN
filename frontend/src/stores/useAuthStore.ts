@@ -107,6 +107,9 @@ export const useAuthStore = create<AuthState>()(
           if (!user) {
             await fetchMe(); // Nếu chưa có thông tin user, gọi fetchMe để lấy thông tin người dùng mới
           }
+
+          // Luôn fetch lại conversations để tránh dùng data cũ từ localStorage cache
+          useChatStore.getState().fetchConversations();
         } catch (error) {
           console.error(error);
           toast.error("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại!");

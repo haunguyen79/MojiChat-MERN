@@ -102,14 +102,12 @@ export const getConversation = async (req, res) => {
       });
 
     const formatted = conversations.map((convo) => {
-      const participants =
-        convo.participants ||
-        [].map((p) => ({
-          _id: p.userId?._id,
-          displayName: p.userId?.displayName,
-          avatarUrl: p.userId?.avatarUrl ?? null,
-          joinedAt: p.joinedAt,
-        }));
+      const participants = (convo.participants || []).map((p) => ({
+        _id: p.userId?._id,
+        displayName: p.userId?.displayName,
+        avatarUrl: p.userId?.avatarUrl ?? null,
+        joinedAt: p.joinedAt,
+      }));
 
       return {
         ...convo.toObject(), // Chuyển đổi Mongoose document thành object JS thuần để có thể thêm thuộc tính mới

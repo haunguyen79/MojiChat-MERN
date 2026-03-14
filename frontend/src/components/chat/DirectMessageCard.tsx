@@ -47,7 +47,7 @@ const DirectMessageCard = ({ convo }: { convo: Conversation }) => {
         <>
           <UserAvatar
             type="sidebar"
-            name={otherUser.displayName}
+            name={otherUser.displayName ?? ""}
             avatarUrl={otherUser.avatarUrl ?? undefined}
           />
           {/* todo: socket io */}
