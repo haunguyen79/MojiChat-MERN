@@ -141,8 +141,8 @@ export const getMessages = async (req, res) => {
       query._id = { $lt: new Date(cursor) }; // Lấy các tin nhắn có _id nhỏ hơn cursor (tức là các tin nhắn cũ hơn)
     }
 
-    let messages = (await Message.find(query))
-      .sort({ createAt: -1 }) // Sắp xếp theo createAt giảm dần để lấy tin nhắn mới nhất trước
+    let messages = await Message.find(query)
+      .sort({ createdAt: -1 }) // Sắp xếp theo createdAt giảm dần để lấy tin nhắn mới nhất trước
       .limit(Number(limit) + 1); // Lấy thêm 1 tin nhắn để kiểm tra xem còn tin nhắn nào nữa hay không
 
     let nextCursor = null;

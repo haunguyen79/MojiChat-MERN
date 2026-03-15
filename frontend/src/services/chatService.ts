@@ -19,6 +19,6 @@ export const chatService = {
       `/conversations/${id}/messages?limit=${pageLimit}&cursor=${cursor}`,
     );
 
-    return { messages: res.data.message, cursor: res.data.nextCursor };
+    return { messages: res.data.messages, cursor: res.data.nextCursor };
   },
 };
