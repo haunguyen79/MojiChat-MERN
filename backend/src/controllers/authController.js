@@ -159,7 +159,6 @@ export const refreshToken = async (req, res) => {
 
     // Return accessToken mới về client
     return res.status(200).json({ accessToken });
-
   } catch (error) {
     console.error("Lỗi khi gọi refreshToken:", error);
     return res.status(500).json({ message: "Lỗi hệ thống" });
