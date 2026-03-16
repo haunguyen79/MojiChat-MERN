@@ -24,7 +24,7 @@ const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
         <Picker
           theme={isDark ? "dark" : "light"}
           data={data}
-          onEmojiSelect={(emoji: any) => onChange(emoji.native)}
+          onEmojiSelect={(emoji: any) => onChange(emoji.native)}  // Gọi hàm onChange với giá trị emoji đã chọn
           emojiSize={24}
         />
       </PopoverContent>
