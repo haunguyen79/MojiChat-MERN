@@ -16,6 +16,13 @@ export const sendDirectMessage = async (req, res) => {
       conversation = await Conversation.findById(conversationId);
     }
     if (!conversation) {
+      // Tìm conversation direct giữa 2 user, nếu có rồi thì dùng luôn, không thì tạo mới
+      conversation = await Conversation.findOne({
+        type: "direct",
+        "participants.userId": { $all: [senderId, recipientId] },
+      });
+    }
+    if (!conversation) {
       conversation = await Conversation.create({
         type: "direct",
         participants: [
