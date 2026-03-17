@@ -11,10 +11,10 @@ import { protectedRoute } from "./middlewares/authMiddleware.js";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs"; // Thư viện dùng để đọc file/tệp json
+import { app, server } from "./socket/index.js";
 
 dotenv.config(); // Load environment variables from .env file
 
-const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware to parse JSON requests
@@ -39,7 +39,7 @@ app.use("/api/messages", messageRoute);
 app.use("/api/conversations", conversationRoute);
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server bắt đầu trên cổng ${PORT}`);
   });
 });
