@@ -62,6 +62,12 @@ export interface ChatState {
     content: string,
     imgUrl?: string,
   ) => Promise<void>;
+
+  // Add message
+  addMessage: (message: Message) => Promise<void>;
+
+  // Update convo
+  updateConversation: (conversation: Conversation) => void;
 }
 
 export interface SocketState {
