@@ -10,6 +10,7 @@ const ChatWindowBody = () => {
     messages: allMessages,
   } = useChatStore();
 
+  // Cách 1:
   const [lastMessageStatus, setLastMessageStatus] = useState<
     "delivered" | "seen"
   >("delivered");
@@ -30,6 +31,28 @@ const ChatWindowBody = () => {
 
     setLastMessageStatus(seenBy.length > 0 ? "seen" : "delivered");
   }, [selectedConvo]);
+
+  // Mark as seen:
+
+  /*// Cách 2:
+  const messages = allMessages[activeConversationId!]?.items ?? [];
+
+  const selectedConvo = conversations.find(
+    (c) => c._id === activeConversationId,
+  );
+
+  const lastMessageStatus: "delivered" | "seen" =
+    selectedConvo?.lastMessage && (selectedConvo?.seenBy?.length ?? 0) > 0
+      ? "seen"
+      : "delivered";
+  */
+
+  /*// Cách 3:
+  const lastMessageStatus = useMemo(() => {
+    if (!selectedConvo?.lastMessage) return "delivered";
+    return (selectedConvo.seenBy?.length ?? 0) > 0 ? "seen" : "delivered";
+  }, [selectedConvo]);
+  */
 
   if (!selectedConvo) {
     return <ChatWelcomeScreen />;
