@@ -1,5 +1,6 @@
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
+import { io } from "../socket/index.js";
 
 export const createConversation = async (req, res) => {
   try {
@@ -177,5 +178,66 @@ export const getUserConversationsForSocketIO = async (userId) => {
   } catch (error) {
     console.error("Lỗi xảy ra khi fetch conversations: ", error);
     return [];
+  }
+};
+
+export const markAsSeen = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user._id.toString();
+
+    const conversation = await Conversation.findById(conversationId).lean(); // .lean() giúp trả về object JS thuần thay vì Mongoose document
+
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation không tồn tại!" });
+    }
+
+    const last = conversation.lastMessage;
+
+    if (!last) {
+      return res
+        .status(200)
+        .json({ message: "Không có tin nhắn để mark as seen" });
+    }
+
+    if (last.senderId.toString() === userId) {
+      return res
+        .status(200)
+        .json({ message: "Không thể mark as seen tin nhắn của chính mình" });
+    }
+
+    // Cập nhật lại seenBy và unreadCounts
+    const updated = await Conversation.findByIdAndUpdate(
+      conversationId,
+      {
+        $addToSet: { seenBy: userId }, // Thêm user này vào mảng seenBy
+        $set: { [`unreadCounts.${userId}`]: 0 }, // Gán giá trị cho 1 file
+      },
+      {
+        new: true, // Trả về document đã được updated
+      },
+    );
+
+    // Phát sự kiện read-message cho tất cả các client trong room conversationId
+    io.to(conversationId).emit("read-message", {
+      conversation: updated,
+      lastMessage: {
+        _id: updated?.lastMessage._id,
+        content: updated?.lastMessage.content,
+        createAt: updated?.lastMessage.createdAt,
+        sender: {
+          _id: updated?.lastMessage.senderId,
+        },
+      },
+    });
+
+    return res.status(200).json({
+      message: "Marked as seen",
+      seenBy: updated?.seenBy || [],
+      myUnreadCount: updated?.unreadCounts[userId] || 0,
+    });
+  } catch (error) {
+    console.error("Lỗi xảy ra khi mark as seen: ", error);
+    return res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
