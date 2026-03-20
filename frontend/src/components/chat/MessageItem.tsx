@@ -18,83 +18,85 @@ const MessageItem = ({
   selectedConvo,
   lastMessageStatus,
 }: MessageItemProps) => {
-  const prev = messages[index - 1];
+  const prev = index + 1 < messages.length ? messages[index + 1] : undefined;
 
-  //Tách nhóm tin nhắn nếu cùng người gửi và cách nhau quá 5 phút
-  const isGroupBreak =
+  const isShowTime =
     index === 0 ||
-    message.senderId !== prev?.senderId || // Tin này và tin nhắn kia khác người gửi
     new Date(message.createdAt).getTime() -
       new Date(prev?.createdAt || 0).getTime() >
       300000; // 5 phút
+
+  //Tách nhóm tin nhắn nếu cùng người gửi và cách nhau quá 5 phút
+  const isGroupBreak = isShowTime || message.senderId !== prev?.senderId;
 
   // Lấy thông tin của người gửi hiện tại để hiển thị thông tin và avatar
   const participant = selectedConvo.participants.find(
     (p: Participant) => p._id.toString() === message.senderId.toString(),
   );
   return (
-    <div
-      className={cn(
-        "flex gap-2 message-bounce",
-        message.isOwn ? "justify-end" : "justify-start",
+    <>
+      {/* Time */}
+      {isShowTime && (
+        <span className="text-xs text-muted-foreground px-1">
+          {formatMessageTime(new Date(message.createdAt))}
+        </span>
       )}
-    >
-      {/* Avatar */}
-      {!message.isOwn && (
-        <div className="w-8">
-          {isGroupBreak && (
-            <UserAvatar
-              type="chat"
-              name={participant?.displayName ?? "Moji"}
-              avatarUrl={participant?.avatarUrl ?? undefined}
-            />
-          )}
-        </div>
-      )}
-
-      {/* Nội dung tin nhắn */}
       <div
         className={cn(
-          "max-w-xs lg:max-w-md space-y-1 flex flex-col mt-1",
-          message.isOwn ? "items-end" : "items-start",
+          "flex gap-2 message-bounce",
+          message.isOwn ? "justify-end" : "justify-start",
         )}
       >
-        <Card
+        {/* Avatar */}
+        {!message.isOwn && (
+          <div className="w-8">
+            {isGroupBreak && (
+              <UserAvatar
+                type="chat"
+                name={participant?.displayName ?? "Moji"}
+                avatarUrl={participant?.avatarUrl ?? undefined}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Nội dung tin nhắn */}
+        <div
           className={cn(
-            "p-3",
-            message.isOwn
-              ? "chat-bubble-sent border-0"
-              : "chat-bubble-received",
+            "max-w-xs lg:max-w-md space-y-1 flex flex-col mt-1",
+            message.isOwn ? "items-end" : "items-start",
           )}
         >
-          <p className="text-sm leading-relaxed break-words">
-            {message.content}
-          </p>
-        </Card>
-
-        {/* Time */}
-        {isGroupBreak && (
-          <span className="text-xs text-muted-foreground px-1">
-            {formatMessageTime(new Date(message.createdAt))}
-          </span>
-        )}
-
-        {/* Seen/Delivered status */}
-        {message.isOwn && message._id === selectedConvo.lastMessage?._id && (
-          <Badge
-            variant="outline"
+          <Card
             className={cn(
-              "text-xs px-1.5 py-0.5 h-4 border-0",
-              lastMessageStatus === "seen"
-                ? "bg-primary/20 text-primary"
-                : "bg-muted text-muted-foreground",
+              "p-3",
+              message.isOwn
+                ? "chat-bubble-sent border-0"
+                : "chat-bubble-received",
             )}
           >
-            {lastMessageStatus}
-          </Badge>
-        )}
+            <p className="text-sm leading-relaxed break-words">
+              {message.content}
+            </p>
+          </Card>
+
+          {/* Seen/Delivered status */}
+          {message.isOwn && message._id === selectedConvo.lastMessage?._id && (
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-xs px-1.5 py-0.5 h-4 border-0",
+                lastMessageStatus === "seen"
+                  ? "bg-primary/20 text-primary"
+                  : "bg-muted text-muted-foreground",
+              )}
+            >
+              {lastMessageStatus}
+            </Badge>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

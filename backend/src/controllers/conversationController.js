@@ -139,7 +139,7 @@ export const getMessages = async (req, res) => {
     const query = { conversationId };
 
     if (cursor) {
-      query._id = { $lt: new Date(cursor) }; // Lấy các tin nhắn có _id nhỏ hơn cursor (tức là các tin nhắn cũ hơn)
+      query.createdAt = { $lt: new Date(cursor) }; // Lấy các tin nhắn có createdAt nhỏ hơn cursor (tức là các tin nhắn cũ hơn)
     }
 
     let messages = await Message.find(query)
@@ -151,7 +151,7 @@ export const getMessages = async (req, res) => {
     if (messages.length > Number(limit)) {
       const nextMessage = messages[messages.length - 1]; // Tin nhắn cuối cùng trong danh sách (tin nhắn cũ nhất)
 
-      nextCursor = nextMessage._id; // Sử dụng _id của tin nhắn cuối cùng làm cursor cho lần truy vấn tiếp theo
+      nextCursor = nextMessage.createdAt.toISOString(); // Lấy createdAt của tin nhắn cuối cùng và chuyển sang dạng chuỗi ISO
 
       messages.pop(); // Loại bỏ tin nhắn cuối cùng khỏi kết quả trả về vì nó chỉ dùng để kiểm tra xem còn tin nhắn nào nữa hay không
     }

@@ -18,13 +18,17 @@ export const useAuthStore = create<AuthState>()(
 
       clearState: () => {
         set({ accessToken: null, user: null, loading: false });
-        localStorage.clear(); // Xóa toàn bộ localStorage để đảm bảo không còn dữ liệu nào liên quan đến phiên làm việc cũ
 
         useChatStore.getState().reset(); // Reset chat store để xóa toàn bộ dữ liệu liên quan đến chat của phiên làm việc cũ
+
+        localStorage.clear(); // Xóa toàn bộ localStorage để đảm bảo không còn dữ liệu nào liên quan đến phiên làm việc cũ
+
+        sessionStorage.clear(); // Xóa toàn bộ sessionStorage để đảm bảo không còn dữ liệu nào liên quan đến phiên làm việc cũ
       },
 
       signUp: async (username, password, email, firstName, lastName) => {
         try {
+          get().clearState();
           set({ loading: true });
           // Call API
           await authService.signUp(
@@ -57,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
           const { accessToken } = await authService.signIn(username, password);
           get().setAccessToken(accessToken);
 
-          await get().fetchMe();  // Gọi API để lấy thông tin người dùng
+          await get().fetchMe(); // Gọi API để lấy thông tin người dùng
           useChatStore.getState().fetchConversations(); // Gọi API để lấy danh sách cuộc trò chuyện
 
           toast.success("Chào mừng bạn đã quay trở lại với Moji 🎉🎉🎉");
