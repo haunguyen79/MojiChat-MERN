@@ -37,7 +37,7 @@ const MessageItem = ({
     <>
       {/* Time */}
       {isShowTime && (
-        <span className="text-xs text-muted-foreground px-1">
+        <span className="flex justify-center text-xs text-muted-foreground px-1">
           {formatMessageTime(new Date(message.createdAt))}
         </span>
       )}

@@ -1,3 +1,7 @@
+// Nếu gặp lỗi DNS resolution, có thể thử đặt lại DNS server
+// import { setServers } from 'dns';
+// setServers(['8.8.8.8', '8.8.4.4']);
+
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./libs/db.js";
@@ -21,6 +25,11 @@ const PORT = process.env.PORT || 5001;
 app.use(express.json());
 app.use(cookieParser()); // Middleware to parse cookies
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
+/* // Nếu muốn cho phép nhiều origin, có thể sử dụng hàm callback để kiểm tra origin
+const allowed = ["http://localhost:5173", "http://localhost:5174"];
+app.use(cors({ origin: (origin, cb) => cb(null, allowed.includes(origin)), credentials: true }));
+*/
 
 // Swagger setup
 const swaggerDocument = JSON.parse(
