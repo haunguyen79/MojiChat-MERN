@@ -32,6 +32,11 @@ io.on("connection", async (socket) => {
     socket.join(id);
   });
 
+  // Join vào room chat khi tạo conversation mới
+  socket.on("join-conversation", (conversationID) => {
+    socket.join(conversationID);
+  });
+
   socket.on("disconnect", () => {
     onlineUsers.delete(user._id);
     io.emit("online-users", Array.from(onlineUsers.keys()));

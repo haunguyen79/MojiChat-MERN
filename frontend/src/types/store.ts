@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io-client";
 import type { Conversation, Message } from "./chat";
-import type { FriendRequest, User } from "./user";
+import type { Friend, FriendRequest, User } from "./user";
 
 export interface AuthState {
   accessToken: string | null;
@@ -71,6 +71,12 @@ export interface ChatState {
 
   // Mark as seen
   markAsSeen: () => Promise<void>;
+  addConvo: (convo: Conversation) => void;
+  createConversation: (
+    type: "direct" | "group",
+    name: string,
+    memberIds: string[],
+  ) => Promise<void>;
 }
 
 export interface SocketState {
@@ -81,6 +87,7 @@ export interface SocketState {
 }
 
 export interface FriendState {
+  friends: Friend[];
   loading: boolean;
   receivedList: FriendRequest[];
   sentList: FriendRequest[];
@@ -89,4 +96,5 @@ export interface FriendState {
   getAllFriendRequests: () => Promise<void>;
   acceptRequest: (requestId: string) => Promise<void>;
   declineRequest: (requestId: string) => Promise<void>;
+  getFriends: () => Promise<void>;
 }
