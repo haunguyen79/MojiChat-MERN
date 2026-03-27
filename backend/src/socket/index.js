@@ -37,6 +37,8 @@ io.on("connection", async (socket) => {
     socket.join(conversationID);
   });
 
+  socket.join(user._id.toString());  // Join vào room riêng của user để nhận thông báo (Tạo phòng riêng theo userId)
+
   socket.on("disconnect", () => {
     onlineUsers.delete(user._id);
     io.emit("online-users", Array.from(onlineUsers.keys()));
