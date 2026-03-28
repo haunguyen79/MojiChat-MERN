@@ -16,6 +16,7 @@ import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs"; // Thư viện dùng để đọc file/tệp json
 import { app, server } from "./socket/index.js";
+import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -30,6 +31,13 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 const allowed = ["http://localhost:5173", "http://localhost:5174"];
 app.use(cors({ origin: (origin, cb) => cb(null, allowed.includes(origin)), credentials: true }));
 */
+
+//CLOUDINARY Configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Swagger setup
 const swaggerDocument = JSON.parse(
