@@ -293,6 +293,16 @@
     @apply scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent dark:scrollbar-thumb-slate-600;
   }
 
+  .beautiful-scrollbar-profile {
+    @apply scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent dark:scrollbar-thumb-slate-600;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+
+  .beautiful-scrollbar-profile::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
   /* Animations */
   .transition-bounce {
     transition: var(--transition-bounce);
